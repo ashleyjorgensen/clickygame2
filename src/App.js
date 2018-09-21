@@ -1,45 +1,89 @@
-import React, { Component } from 'react';
-import './App.css';
-import PuppyCard from "./components/PuppyCard"
-import Container from "./components/Container"
-import Wrapper from "./components/Wrapper"
-import puppycards from "./puppycards.json"
+import React, { Component } from "react";
+import "./App.css";
+import PuppyCard from "./components/PuppyCard/PuppyCard";
+import Title from "./components/Title";
+import Wrapper from "./components/Wrapper";
+import puppycards from "./puppycards.js";
 
-
-class App extends Component { 
+class App extends Component {
   state = {
-    puppycards 
-  }
-};
+    puppycards,
+    score: 0,
+    topScore: 0
+  };
 
-// removePuppyCard => {
-//   const puppycards = this.state.puppycards.filter(puppycards => puppycards.id);
-//   this.setState({ puppycards });
-// };
+  shufflePups = puppies => {
+    var j, x, i;
+    for (i = puppies.length - 1; i > 0; i--) {
+      j = Math.floor(Math.random() * (i + 1));
+      x = puppies[i];
+      puppies[i] = puppies[j];
+      puppies[j] = x;
+    }
+    return puppies;
+  };
 
-render = () => { 
+  handleCorrectGuess = newData => {
+    const { score, topScore } = this.state;
+    const newScore = score + 1;
+    let newTopScore = 0;
+    if (newScore > topScore) {
+      newTopScore = newScore;
+    } else {
+      newTopScore = topScore;
+    }
+
+    this.setState({
+      puppycards: this.shufflePups(newData),
+      score: newScore,
+      topScore: newTopScore
+    });
+    
+  };
+
+  handleIncorrectGuess = newData => {
+    this.setState({
+      score: 0,
+      puppycards: this.shufflePups(newData)
+    });
+    // shuffle the cards
+  };
+  handleItemClick = id => {
+    let guessedCorrectly = false;
+    const newData = this.state.puppycards.map(item => {
+      const newItem = { ...item };
+      if (newItem.id === id) {
+        if (!newItem.clicked) {
+          newItem.clicked = true;
+          guessedCorrectly = true;
+        }
+      }
+      console.log(newItem);
+      return newItem;
+    });
+
+    guessedCorrectly
+      ? this.handleCorrectGuess(newData)
+      : this.handleIncorrectGuess(newData);
+  };
+
+  render() {
     return (
-    <Wrapper>
-      <Title>Cute Puppies</Title>
-      {this.state.puppycards.map(puppycards =>(
-        <div>PuppyCard  
-        remove.PuppyCard={this.removePuppyCard}
-        id={puppycard.id}
-        key={puppycard.id}
-        image={puppycard.image}
-        </div>
-      ))}
-      </Wrapper>
-      )
-    };
-   
-
-
-
-
-
-
-
-
+      <div>
+        {this.state.puppycards.map(puppycard => (
+          <PuppyCard
+            handleClick={this.handleItemClick}
+            id={puppycard.id}
+            key={puppycard.id}
+            image={puppycard.image}
+          />
+        ))}
+      </div>
+    );
+  }
+}
 
 export default App;
+
+
+

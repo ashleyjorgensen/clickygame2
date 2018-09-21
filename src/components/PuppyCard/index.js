@@ -1,1 +1,1 @@
-// export { default } from "./PuppyCard";
+export { default } from "./PuppyCard";
